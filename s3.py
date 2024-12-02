@@ -91,3 +91,26 @@ def recall_preference(self, name, age):
         print(ai.learn_about_user(user_name, user_age, user_likes))
         print(ai.emoji_response())
         print(ai.sexy_tip())
+
+
+"""s3.py 12 problems
+A Decorator @staticmethod on a method outside the class :22
+
+A Decorator @staticmethod on a method outside the class :28
+A Decorator @staticmethod on a method outside the class :39
+
+A Decorator @staticmethod on a method outside the class :60
+
+A Unresolved attribute reference 'learn_about_user' for class 'SimpleAl' :91
+A Unresolved attribute reference 'emoji_response' for class 'SimpleAl' :92
+A Unresolved attribute reference 'sexy_tip' for class 'SimpleAl' :93
+
+A Instance attribute mood defined outside _init_ :6
+
+A Instance attribute user_info defined outside _init_ :7
+
+A Instance attribute user_preferences defined outside _init _: 8
+
+A Local function 'start_conversation' is not used :86
+
+A Shadows name 'user_likes' from outer scope :90"""

@@ -1,0 +1,268 @@
+<html><head><base href="." /><style>
+  body { 
+    background: #000;
+    color: #0f0;
+    font-family: monospace;
+    margin: 0;
+    padding: 20px;
+    overflow: hidden;
+    height: 100vh;
+    box-sizing: border-box;
+  }
+
+  #terminal {
+    width: calc(100% - 250px);
+    height: calc(100vh - 100px);
+    border: 1px solid #0f0;
+    padding: 10px;
+    overflow-y: auto;
+    position: relative;
+    margin-bottom: 10px;
+    resize: both; /* Enable resizing */
+    min-width: 300px; /* Minimum width */
+    min-height: 200px; /* Minimum height */
+  }
+
+  /* Add resize handle styling */
+  #terminal::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    cursor: se-resize;
+    background: linear-gradient(135deg, transparent 50%, #0f0 50%);
+  }
+
+  #input-line {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    width: calc(100% - 250px);
+  }
+
+  #prompt {
+    color: #0f0;
+    margin-right: 10px;
+  }
+
+  #command {
+    background: transparent;
+    border: none;
+    color: #0f0;
+    font-family: monospace;
+    font-size: 16px;
+    width: 100%;
+    outline: none;
+  }
+
+  .node {
+    cursor: pointer;
+    padding: 5px;
+    border: 1px solid #0f0;
+    margin: 5px;
+    display: inline-block;
+    width: calc(100% - 20px);
+    box-sizing: border-box;
+  }
+
+  #status-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #0f0;
+    color: #000;
+    padding: 5px 20px;
+    display: flex;
+    justify-content: space-between;
+    height: 30px;
+    align-items: center;
+  }
+
+  .blink {
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  .error {
+    color: #f00;
+  }
+
+  .success {
+    color: #0f0;
+  }
+
+  #network-map {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    border: 1px solid #0f0;
+    padding: 10px;
+    background: rgba(0,0,0,0.8);
+    width: 200px;
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+    resize: both; /* Enable resizing */
+    min-width: 150px; /* Minimum width */
+    min-height: 200px; /* Minimum height */
+  }
+
+  #nodes {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+</style></head><body>
+
+<div id="network-map">
+  Network Map
+  <div id="nodes"></div>
+</div>
+
+<div id="terminal">
+  <div id="output"></div>
+</div>
+
+<div id="input-line">
+  <span id="prompt">></span>
+  <input type="text" id="command" autofocus>
+</div>
+
+<div id="status-bar">
+  <span>CPU: <span id="cpu">0%</span></span>
+  <span>Memory: <span id="memory">0 KB</span></span>
+  <span>Security Level: <span id="security">0</span></span>
+  <span>Credits: $<span id="credits">1000</span></span>
+</div>
+
+<script>
+const state = {
+  nodes: [
+    {id: 'home', name: 'Home System', security: 1, connected: true},
+    {id: 'bank', name: 'Global Bank', security: 5, connected: false},
+    {id: 'corp', name: 'MegaCorp', security: 4, connected: false},
+    {id: 'gov', name: 'Government', security: 8, connected: false}
+  ],
+  currentNode: 'home',
+  programs: ['scan', 'crack', 'decrypt'],
+  credits: 1000,
+  security: 1
+};
+
+function print(text, className = '') {
+  const output = document.getElementById('output');
+  const line = document.createElement('div');
+  line.className = className;
+  line.textContent = text;
+  output.appendChild(line);
+  output.scrollTop = output.scrollHeight;
+}
+
+function updateStatus() {
+  document.getElementById('cpu').textContent = Math.floor(Math.random() * 100) + '%';
+  document.getElementById('memory').textContent = Math.floor(Math.random() * 1000) + ' KB';
+  document.getElementById('security').textContent = state.security;
+  document.getElementById('credits').textContent = state.credits;
+}
+
+function renderNodes() {
+  const nodesDiv = document.getElementById('nodes');
+  nodesDiv.innerHTML = '';
+  state.nodes.forEach(node => {
+    const nodeEl = document.createElement('div');
+    nodeEl.className = 'node';
+    nodeEl.textContent = `${node.name} (Sec ${node.security})`;
+    nodeEl.onclick = () => connect(node.id);
+    if (node.connected) {
+      nodeEl.style.background = '#0f0';
+      nodeEl.style.color = '#000';
+    }
+    nodesDiv.appendChild(nodeEl);
+  });
+}
+
+function connect(nodeId) {
+  const node = state.nodes.find(n => n.id === nodeId);
+  if (node.security > state.security) {
+    print(`Access denied: Insufficient security clearance for ${node.name}`, 'error');
+    return;
+  }
+  
+  state.nodes.forEach(n => n.connected = false);
+  node.connected = true;
+  state.currentNode = nodeId;
+  print(`Connected to ${node.name}`, 'success');
+  renderNodes();
+}
+
+function processCommand(cmd) {
+  const parts = cmd.toLowerCase().split(' ');
+  const command = parts[0];
+  const target = parts[1];
+
+  switch(command) {
+    case 'help':
+      print('Available commands: help, scan, crack, decrypt, connect, status');
+      break;
+    case 'scan':
+      print('Scanning network...');
+      setTimeout(() => {
+        print('Found nodes:', 'success');
+        state.nodes.forEach(node => {
+          print(`- ${node.name} (Security Level: ${node.security})`);
+        });
+      }, 1000);
+      break;
+    case 'crack':
+      if (!target) {
+        print('Usage: crack <target>', 'error');
+        return;
+      }
+      print(`Attempting to crack ${target}...`);
+      setTimeout(() => {
+        state.security++;
+        print('Security level increased!', 'success');
+        updateStatus();
+      }, 2000);
+      break;
+    case 'status':
+      print(`Current node: ${state.currentNode}`);
+      print(`Security level: ${state.security}`);
+      print(`Credits: $${state.credits}`);
+      break;
+    default:
+      print(`Unknown command: ${command}`, 'error');
+  }
+}
+
+document.getElementById('command').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    const cmd = e.target.value;
+    print(`> ${cmd}`);
+    processCommand(cmd);
+    e.target.value = '';
+  }
+});
+
+// Initial setup
+renderNodes();
+updateStatus();
+print('Welcome to CyberHack v1.0');
+print('Type "help" for available commands');
+
+// Update status regularly
+setInterval(updateStatus, 1000);
+
+// Add event listener to handle terminal resizing
+const terminal = document.getElementById('terminal');
+terminal.addEventListener('mouseup', () => {
+  // Adjust input line width to match terminal width
+  const inputLine = document.getElementById('input-line');
+  inputLine.style.width = terminal.style.width;
+});
+</script></body></html>

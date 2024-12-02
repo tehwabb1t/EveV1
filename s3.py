@@ -54,7 +54,7 @@ def learn_about_user(self, name, age, likes):
     self.user_info["name"] = name
     self.user_info["age"] = age
     self.user_info["likes"] = likes
-    return f"Now I know you're {name}, {age} years old, and you like {likes}! Let's get coding!"
+    return "Now I know you're {name}, {age} years old, and you like {likes}! Let's get coding!"
 
 
 @staticmethod
@@ -71,9 +71,15 @@ def remember_user_preference():
     return random.choice(suggestions)
 
 
-def recall_preference(self):
-    if self.user_preferences:
-        return f"You know, onii-chan, I recall you enjoying {random.choice(self.user_preferences)}"
+def recall_preference(self, name, age):
+    if name and age:
+        user_likes = "deep hard anal, getting my cock sucked"  # Default likes for now
+        self.user_info["name"] = name
+        self.user_info["age"] = age
+        self.user_info["likes"] = user_likes
+        print(self.learn_about_user(name, age, user_likes))
+        print(self.emoji_response())
+        print(self.sexy_tip())
     else:
         return "We haven't had a chance to discuss your preferences yet, but I'm all ears!"
 
